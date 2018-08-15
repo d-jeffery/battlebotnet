@@ -13,38 +13,17 @@ const BUY_PROXY = 4;
 const BUY_MINE = 5;
 const END_TURN = 6;
 
+class Points {
+    constructor() {
+        this.income = 3;
+        this.money = 3;
+        this.power = 0;
+        this.security = 0;
+        this.availablity = 3;
+    }
+}
+
+/**
+ * Store to purchase upgrades.
+ */
 class Store {}
-
-/**
- * A botnet.
- */
-class BotNet {
-    constructor() {
-        this.hosts = 0;
-    }
-
-    getHostCount() {
-        return this.hosts;
-    }
-
-    upgrade() {
-        this.hosts++;
-    }
-}
-
-/**
- * Your webserver.
- */
-class Server {
-    constructor() {
-        this.level = 0;
-    }
-
-    getUpgradeLevel() {
-        return this.level;
-    }
-
-    upgrade() {
-        this.level++;
-    }
-}

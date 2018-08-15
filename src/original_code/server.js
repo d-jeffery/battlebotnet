@@ -48,11 +48,6 @@ class Game {
     }
 
     /**
-     * A game turn.
-     */
-    turn() {}
-
-    /**
      * Is game ended
      * @return {boolean}
      */
@@ -97,7 +92,6 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
-        this.endedTurn = false;
     }
 
     /**
@@ -184,11 +178,6 @@ module.exports = {
                     storage.set('games', games + 1);
                 });
             }
-        });
-
-        socket.on('endTurn', () => {
-            console.log('End Turn: ' + socket.id);
-            user.endedTurn = true;
         });
 
         console.log('Connected: ' + socket.id);

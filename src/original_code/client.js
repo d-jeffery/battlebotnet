@@ -4,13 +4,12 @@
     let socket, //Socket.IO client
         buttons, //Button elements
         message, //Message element
-        stats, //Score element
-        results,
-        points = new Points(),
-        score = {
+        score, //Score element
+        points = {
+            //Game points
+            draw: 0,
             win: 0,
-            lose: 0,
-            draw: 0
+            lose: 0
         };
 
     /**
@@ -41,28 +40,14 @@
 
     /**
      * Set score text
-     */
-    function displayStats() {
-        stats.innerHTML = [
-            '<h2>Your Stats</h2>',
-            'Income: ' + points.income,
-            'Money: ' + points.money,
-            'Power: ' + points.power,
-            'Security: ' + points.security,
-            'Availability: ' + points.availablity
-        ].join('<br>');
-    }
-
-    /**
-     * Set score text
      * @param {string} text
      */
     function displayScore(text) {
-        results.innerHTML = [
+        score.innerHTML = [
             '<h2>' + text + '</h2>',
-            'Won: ' + score.win,
-            'Lost: ' + score.lose,
-            'Draw: ' + score.draw
+            'Won: ' + points.win,
+            'Lost: ' + points.lose,
+            'Draw: ' + points.draw
         ].join('<br>');
     }
 
@@ -71,27 +56,22 @@
      */
     function bind() {
         socket.on('start', () => {
-            points = new Points();
             enableButtons();
-            setMessage('Round ' + (score.win + score.lose + score.draw + 1));
-        });
-
-        socket.on('turn', () => {
-            displayStats();
+            setMessage('Round ' + (points.win + points.lose + points.draw + 1));
         });
 
         socket.on('win', () => {
-            score.win++;
+            points.win++;
             displayScore('You win!');
         });
 
         socket.on('lose', () => {
-            score.lose++;
+            points.lose++;
             displayScore('You lose!');
         });
 
         socket.on('draw', () => {
-            score.draw++;
+            points.draw++;
             displayScore('Draw!');
         });
 
@@ -116,27 +96,16 @@
         });
 
         for (let i = 0; i < buttons.length; i++) {
-            ((button, option) => {
-                if (option === END_TURN) {
-                    button.addEventListener(
-                        'click',
-                        e => {
-                            disableButtons();
-                            socket.emit('endTurn');
-                        },
-                        false
-                    );
-                } else {
-                    button.addEventListener(
-                        'click',
-                        e => {
-                            disableButtons();
-                            socket.emit('guess', option);
-                        },
-                        false
-                    );
-                }
-            })(buttons[i], i);
+            ((button, guess) => {
+                button.addEventListener(
+                    'click',
+                    function(e) {
+                        disableButtons();
+                        socket.emit('guess', guess);
+                    },
+                    false
+                );
+            })(buttons[i], i + 1);
         }
     }
 
@@ -147,9 +116,7 @@
         socket = io({ upgrade: false, transports: ['websocket'] });
         buttons = document.getElementsByTagName('button');
         message = document.getElementById('message');
-        stats = document.getElementById('stats');
-        results = document.getElementById('results');
-        displayStats();
+        score = document.getElementById('score');
         disableButtons();
         bind();
     }
