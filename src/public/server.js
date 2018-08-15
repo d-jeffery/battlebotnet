@@ -48,9 +48,11 @@ class Game {
     }
 
     /**
-     * A game turn.
+     * Whether the game turn has ended.
      */
-    turn() {}
+    turnEnded() {
+        return this.user1.endedTurn && this.user2.endedTurn;
+    }
 
     /**
      * Is game ended
@@ -98,6 +100,7 @@ class User {
         this.opponent = null;
         this.guess = GUESS_NO;
         this.endedTurn = false;
+        this.points = new Points();
     }
 
     /**
@@ -121,7 +124,8 @@ class User {
         this.game = game;
         this.opponent = opponent;
         this.guess = GUESS_NO;
-        this.socket.emit('start');
+        this.points = new Points();
+        this.socket.emit('start', this.points);
     }
 
     /**
@@ -131,7 +135,16 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
+        this.points = new Points();
         this.socket.emit('end');
+    }
+
+    /**
+     * Trigger turn event
+     */
+    turn() {
+        this.endedTurn = false;
+        this.socket.emit('turn', this.points);
     }
 
     /**
@@ -189,6 +202,10 @@ module.exports = {
         socket.on('endTurn', () => {
             console.log('End Turn: ' + socket.id);
             user.endedTurn = true;
+            if (user.game.turnEnded()) {
+                user.turn();
+                user.opponent.turn();
+            }
         });
 
         console.log('Connected: ' + socket.id);

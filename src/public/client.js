@@ -4,9 +4,9 @@
     let socket, //Socket.IO client
         buttons, //Button elements
         message, //Message element
-        stats, //Score element
+        stats, //Status element
         results,
-        points = new Points(),
+        points,
         score = {
             win: 0,
             lose: 0,
@@ -70,14 +70,19 @@
      * Bind Socket.IO and button events
      */
     function bind() {
-        socket.on('start', () => {
-            points = new Points();
+        socket.on('start', p => {
+            points = p;
+            console.log('Game start', p);
+            displayStats();
             enableButtons();
             setMessage('Round ' + (score.win + score.lose + score.draw + 1));
         });
 
-        socket.on('turn', () => {
+        socket.on('turn', p => {
+            points = p;
+            console.log('New turn', p);
             displayStats();
+            enableButtons();
         });
 
         socket.on('win', () => {
@@ -149,7 +154,6 @@
         message = document.getElementById('message');
         stats = document.getElementById('stats');
         results = document.getElementById('results');
-        displayStats();
         disableButtons();
         bind();
     }
