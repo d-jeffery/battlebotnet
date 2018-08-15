@@ -7,6 +7,7 @@
         stats, //Status element
         results,
         points,
+        enemyPoints,
         score = {
             win: 0,
             lose: 0,
@@ -40,17 +41,43 @@
     }
 
     /**
+     * Wraps line in divs
+     * @param {string} l
+     * @returns {string}
+     */
+    function formatLine(l) {
+        return '<div>' + l + '</div>';
+    }
+
+    /**
+     * Print points.
+     * @param {Points} p
+     * @returns {string[]}
+     */
+    function formatPoints(p) {
+        return [
+            'Income: ' + p.income,
+            'Money: ' + p.money,
+            'Power: ' + p.power,
+            'Security: ' + p.security,
+            'Availability: ' + p.availablity
+        ].map(formatLine);
+    }
+
+    /**
      * Set score text
      */
     function displayStats() {
         stats.innerHTML = [
+            '<div class="stat-window">',
             '<h2>Your Stats</h2>',
-            'Income: ' + points.income,
-            'Money: ' + points.money,
-            'Power: ' + points.power,
-            'Security: ' + points.security,
-            'Availability: ' + points.availablity
-        ].join('<br>');
+            ...formatPoints(points),
+            '</div>',
+            '<div class="stat-window">',
+            '<h2>Enemy Stats</h2>',
+            ...formatPoints(enemyPoints),
+            '</div>'
+        ].join('');
     }
 
     /**
@@ -70,16 +97,18 @@
      * Bind Socket.IO and button events
      */
     function bind() {
-        socket.on('start', p => {
+        socket.on('start', (p, op) => {
             points = p;
+            enemyPoints = op;
             console.log('Game start', p);
             displayStats();
             enableButtons();
             setMessage('Round ' + (score.win + score.lose + score.draw + 1));
         });
 
-        socket.on('turn', p => {
+        socket.on('turn', (p, op) => {
             points = p;
+            enemyPoints = op;
             console.log('New turn', p);
             displayStats();
             enableButtons();

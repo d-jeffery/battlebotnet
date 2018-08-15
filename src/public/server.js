@@ -99,6 +99,7 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
+        this.turnNum = 0;
         this.endedTurn = false;
         this.points = new Points();
     }
@@ -124,8 +125,10 @@ class User {
         this.game = game;
         this.opponent = opponent;
         this.guess = GUESS_NO;
+        this.turnNum = 0;
+        this.endedTurn = false;
         this.points = new Points();
-        this.socket.emit('start', this.points);
+        this.socket.emit('start', this.points, this.opponent.points);
     }
 
     /**
@@ -135,6 +138,8 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
+        this.turnNum = 0;
+        this.endedTurn = false;
         this.points = new Points();
         this.socket.emit('end');
     }
@@ -143,8 +148,9 @@ class User {
      * Trigger turn event
      */
     turn() {
+        this.turnNum++;
         this.endedTurn = false;
-        this.socket.emit('turn', this.points);
+        this.socket.emit('turn', this.points, this.opponent.points);
     }
 
     /**
