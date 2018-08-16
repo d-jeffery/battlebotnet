@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 /**
@@ -37,14 +38,30 @@ class Game {
     constructor(user1, user2) {
         this.user1 = user1;
         this.user2 = user2;
+        this.turnNum = 0;
     }
 
     /**
      * Start new game
      */
     start() {
+        this.turnNum = 0;
         this.user1.start(this, this.user2);
         this.user2.start(this, this.user1);
+    }
+
+    /**
+     * Do a game turn
+     */
+    turn() {
+        // Update turn
+        this.turnNum++;
+        // Updated state
+        this.user1.state.update();
+        this.user2.state.update();
+        // Do turn
+        this.user1.turn();
+        this.user2.turn();
     }
 
     /**
@@ -99,9 +116,8 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
-        this.turnNum = 0;
         this.endedTurn = false;
-        this.points = new Points();
+        this.state = new State();
     }
 
     /**
@@ -125,10 +141,9 @@ class User {
         this.game = game;
         this.opponent = opponent;
         this.guess = GUESS_NO;
-        this.turnNum = 0;
         this.endedTurn = false;
-        this.points = new Points();
-        this.socket.emit('start', this.points, this.opponent.points);
+        this.state = new State();
+        this.socket.emit('start', this.state, this.opponent.state, this.game.turnNum);
     }
 
     /**
@@ -138,9 +153,8 @@ class User {
         this.game = null;
         this.opponent = null;
         this.guess = GUESS_NO;
-        this.turnNum = 0;
         this.endedTurn = false;
-        this.points = new Points();
+        this.state = new State();
         this.socket.emit('end');
     }
 
@@ -148,9 +162,8 @@ class User {
      * Trigger turn event
      */
     turn() {
-        this.turnNum++;
         this.endedTurn = false;
-        this.socket.emit('turn', this.points, this.opponent.points);
+        this.socket.emit('turn', this.state, this.opponent.state, this.game.turnNum);
     }
 
     /**
@@ -174,6 +187,78 @@ class User {
         this.socket.emit('draw', this.opponent.guess);
     }
 }
+
+/**
+ * State of player.
+ */
+class State {
+    constructor() {
+        this.points = new Points();
+        this.purchases = new Purchases();
+    }
+
+    update() {
+        this.points.updateMoney();
+    }
+}
+
+/**
+ * Player Points.
+ */
+class Points {
+    constructor() {
+        // Resources
+        this.income = 3;
+        this.money = 3;
+        this.power = 0;
+        this.security = 0;
+        this.availablity = 3;
+    }
+
+    /**
+     * Sets the availability.
+     * @param {number} a
+     */
+    setAvailablity(a) {
+        this.availablity = a;
+    }
+
+    /**
+     * Update points.
+     */
+    updateMoney() {
+        this.money += this.income;
+    }
+}
+
+/**
+ * Player inventory.
+ */
+class Purchases {
+    constructor() {
+        // Purchases
+        this.botnetLevel = 0;
+        this.hackers = {};
+        this.fireWall = false;
+        this.serverLevel = 0;
+        this.proxy = PROXY_NONE;
+        this.mineLevel = 0;
+    }
+
+    // Update hackers
+}
+
+/**
+ * Store to purchase upgrades.
+ */
+const store = {
+    /**
+     * Make a purchase
+     * @param {number} option
+     * @param {State} state
+     */
+    purchase(option, state) {}
+};
 
 /**
  * Socket.IO on connect event
@@ -209,8 +294,7 @@ module.exports = {
             console.log('End Turn: ' + socket.id);
             user.endedTurn = true;
             if (user.game.turnEnded()) {
-                user.turn();
-                user.opponent.turn();
+                user.game.turn();
             }
         });
 

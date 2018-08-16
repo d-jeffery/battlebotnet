@@ -1,3 +1,4 @@
+// @flow
 'use strict';
 
 (function() {
@@ -5,9 +6,10 @@
         buttons, //Button elements
         message, //Message element
         stats, //Status element
-        results,
-        points,
-        enemyPoints,
+        results, //Results element
+        playerState,
+        enemyState,
+        turn = 0,
         score = {
             win: 0,
             lose: 0,
@@ -71,11 +73,11 @@
         stats.innerHTML = [
             '<div class="stat-window">',
             '<h2>Your Stats</h2>',
-            ...formatPoints(points),
+            ...formatPoints(playerState.points),
             '</div>',
             '<div class="stat-window">',
             '<h2>Enemy Stats</h2>',
-            ...formatPoints(enemyPoints),
+            ...formatPoints(enemyState.points),
             '</div>'
         ].join('');
     }
@@ -97,21 +99,24 @@
      * Bind Socket.IO and button events
      */
     function bind() {
-        socket.on('start', (p, op) => {
-            points = p;
-            enemyPoints = op;
-            console.log('Game start', p);
+        socket.on('start', (s, os, t) => {
+            playerState = s;
+            enemyState = os;
+            turn = t + 1;
+            console.log('Game start', s);
             displayStats();
             enableButtons();
-            setMessage('Round ' + (score.win + score.lose + score.draw + 1));
+            setMessage('Turn ' + turn);
         });
 
-        socket.on('turn', (p, op) => {
-            points = p;
-            enemyPoints = op;
-            console.log('New turn', p);
+        socket.on('turn', (s, os, t) => {
+            playerState = s;
+            enemyState = os;
+            turn = t + 1;
+            console.log('New turn', s);
             displayStats();
             enableButtons();
+            setMessage('Turn ' + turn);
         });
 
         socket.on('win', () => {
