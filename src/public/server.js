@@ -57,8 +57,8 @@ class Game {
         // Update turn
         this.turnNum++;
         // Updated state
-        this.user1.state.update();
-        this.user2.state.update();
+        this.user1.state.turnUpdate();
+        this.user2.state.turnUpdate();
         // Do turn
         this.user1.turn();
         this.user2.turn();
@@ -197,8 +197,8 @@ class State {
         this.purchases = new Purchases();
     }
 
-    update() {
-        this.points.updateMoney();
+    turnUpdate() {
+        this.points.money += this.points.income;
     }
 }
 
@@ -221,13 +221,6 @@ class Points {
      */
     setAvailablity(a) {
         this.availablity = a;
-    }
-
-    /**
-     * Update points.
-     */
-    updateMoney() {
-        this.money += this.income;
     }
 }
 
@@ -257,7 +250,81 @@ const store = {
      * @param {number} option
      * @param {State} state
      */
-    purchase(option, state) {}
+    purchase(option, state) {
+        if (this.canBuy(option, state)) {
+            state.points.money -= this.getPrice(option, state.purchases);
+            switch (option) {
+                case BUY_BOTNET:
+                    state.purchases.botnetLevel++;
+                    break;
+                case BUY_HACKER:
+                    break;
+                case BUY_FIREWALL:
+                    state.purchases.fireWall = true;
+                    break;
+                case BUY_SERVER:
+                    state.purchases.serverLevel++;
+                    break;
+                case BUY_PROXY:
+                    state.purchases.proxy++;
+                    break;
+                case BUY_MINE:
+                    state.purchases.mineLevel++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    },
+
+    /**
+     * Get price of item.
+     * @param option
+     * @param {State} state
+     * @returns {number}
+     */
+    canBuy(option, state) {
+        const canAfford = this.getPrice(option, state.purchases) <= state.points.money;
+
+        switch (option) {
+            case BUY_FIREWALL:
+                return !state.purchases.fireWall && canAfford;
+            case BUY_PROXY:
+                if (state.purchases.proxy === PROXY_ENTERPRISE) return false;
+                return state.points.income > 4 && canAfford;
+            default:
+                return canAfford;
+        }
+    },
+
+    /**
+     * Get price of item.
+     * @param option
+     * @param {Purchases} purchases
+     * @returns {number}
+     */
+    getPrice(option, purchases) {
+        switch (option) {
+            case BUY_BOTNET:
+                if (purchases.botnetLevel === 0) {
+                    return 3;
+                } else {
+                    return 2;
+                }
+            case BUY_HACKER:
+                return 5;
+            case BUY_FIREWALL:
+                return 1;
+            case BUY_SERVER:
+                return 2 + purchases.serverLevel;
+            case BUY_PROXY:
+                return 3;
+            case BUY_MINE:
+                return 3;
+            default:
+                return Number.MAX_SAFE_INTEGER;
+        }
+    }
 };
 
 /**
@@ -288,6 +355,11 @@ module.exports = {
                     storage.set('games', games + 1);
                 });
             }
+        });
+
+        socket.on('purchase', option => {
+            console.log('purchase: ' + socket.id);
+            store.purchase(option, user.state);
         });
 
         socket.on('endTurn', () => {

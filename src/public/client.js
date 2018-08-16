@@ -103,7 +103,7 @@
             playerState = s;
             enemyState = os;
             turn = t + 1;
-            console.log('Game start', s);
+            console.log('Game start', s.purchases);
             displayStats();
             enableButtons();
             setMessage('Turn ' + turn);
@@ -113,7 +113,7 @@
             playerState = s;
             enemyState = os;
             turn = t + 1;
-            console.log('New turn', s);
+            console.log('New turn', s.purchases);
             displayStats();
             enableButtons();
             setMessage('Turn ' + turn);
@@ -169,8 +169,8 @@
                     button.addEventListener(
                         'click',
                         e => {
-                            disableButtons();
-                            socket.emit('guess', option);
+                            socket.emit('purchase', option);
+                            // socket.emit('guess', option);
                         },
                         false
                     );
