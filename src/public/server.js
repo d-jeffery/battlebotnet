@@ -198,7 +198,10 @@ class State {
     }
 
     turnUpdate() {
-        this.points.money += this.points.income;
+        this.points.money += 3 + this.purchases.mineLevel;
+        if (this.purchases.proxy === PROXY_BASIC) this.points.money -= 2;
+        if (this.purchases.proxy === PROXY_ENTERPRISE) this.points.money -= 4;
+        this.purchases.hackers = this.purchases.hackers.map(x => x - 1).filter(x => x > 0);
     }
 }
 
@@ -208,7 +211,6 @@ class State {
 class Points {
     constructor() {
         // Resources
-        this.income = 3;
         this.money = 3;
         this.power = 0;
         this.security = 0;
@@ -231,7 +233,7 @@ class Purchases {
     constructor() {
         // Purchases
         this.botnetLevel = 0;
-        this.hackers = {};
+        this.hackers = [];
         this.fireWall = false;
         this.serverLevel = 0;
         this.proxy = PROXY_NONE;
@@ -258,6 +260,7 @@ const store = {
                     state.purchases.botnetLevel++;
                     break;
                 case BUY_HACKER:
+                    state.purchases.hackers.push(3);
                     break;
                 case BUY_FIREWALL:
                     state.purchases.fireWall = true;
@@ -281,7 +284,7 @@ const store = {
      * Get price of item.
      * @param option
      * @param {State} state
-     * @returns {number}
+     * @returns {boolean}
      */
     canBuy(option, state) {
         const canAfford = this.getPrice(option, state.purchases) <= state.points.money;
@@ -291,7 +294,7 @@ const store = {
                 return !state.purchases.fireWall && canAfford;
             case BUY_PROXY:
                 if (state.purchases.proxy === PROXY_ENTERPRISE) return false;
-                return state.points.income > 4 && canAfford;
+                return canAfford;
             default:
                 return canAfford;
         }
@@ -318,6 +321,7 @@ const store = {
             case BUY_SERVER:
                 return 2 + purchases.serverLevel;
             case BUY_PROXY:
+                if (purchases.proxy === PROXY_NONE) return 2;
                 return 3;
             case BUY_MINE:
                 return 3;
