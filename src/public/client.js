@@ -58,7 +58,6 @@
      */
     function formatPoints(p) {
         return [
-            'Income: ' + p.income,
             'Money: ' + p.money,
             'Power: ' + p.power,
             'Security: ' + p.security,
@@ -107,6 +106,12 @@
             displayStats();
             enableButtons();
             setMessage('Turn ' + turn);
+        });
+
+        socket.on('state', s => {
+            playerState = s;
+            console.log('State change', s);
+            displayStats();
         });
 
         socket.on('turn', (s, os, t) => {

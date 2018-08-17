@@ -159,9 +159,18 @@ class User {
     }
 
     /**
+     * Trigger on state change, like purchase.
+     */
+    stateChange() {
+        this.state.stateUpdate();
+        this.socket.emit('state', this.state);
+    }
+
+    /**
      * Trigger turn event
      */
     turn() {
+        this.state.stateUpdate();
         this.endedTurn = false;
         this.socket.emit('turn', this.state, this.opponent.state, this.game.turnNum);
     }
@@ -203,6 +212,14 @@ class State {
         if (this.purchases.proxy === PROXY_ENTERPRISE) this.points.money -= 4;
         this.purchases.hackers = this.purchases.hackers.map(x => x - 1).filter(x => x > 0);
     }
+
+    stateUpdate() {
+        this.points.power = this.purchases.botnetLevel + this.purchases.hackers.length * 3;
+        this.points.security =
+            this.purchases.serverLevel +
+            (this.purchases.fireWall ? 2 : 0) +
+            this.purchases.proxy * 5;
+    }
 }
 
 /**
@@ -214,6 +231,7 @@ class Points {
         this.money = 3;
         this.power = 0;
         this.security = 0;
+        this.traffic = 0;
         this.availablity = 3;
     }
 
@@ -239,8 +257,6 @@ class Purchases {
         this.proxy = PROXY_NONE;
         this.mineLevel = 0;
     }
-
-    // Update hackers
 }
 
 /**
@@ -364,6 +380,7 @@ module.exports = {
         socket.on('purchase', option => {
             console.log('purchase: ' + socket.id);
             store.purchase(option, user.state);
+            user.stateChange();
         });
 
         socket.on('endTurn', () => {
