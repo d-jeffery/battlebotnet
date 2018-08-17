@@ -35,6 +35,62 @@
     }
 
     /**
+     * Update the button text.
+     * @param {number} buttonNum
+     * @param {string} title
+     * @param {string} text
+     * @param {string} cost
+     */
+    function updateButtonText(buttonNum, title, text, cost) {
+        buttons[buttonNum].innerHTML = [
+            '<div>' + title + '</div>',
+            '<div>' + text + '</div>',
+            '<div>' + cost + '</div>'
+        ].join('');
+    }
+
+    /**
+     * Update the buttons.
+     */
+    function updateButtons() {
+        const p = playerState.purchases;
+
+        updateButtonText(
+            0,
+            p.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
+            '+1 Power',
+            'Cost: $' + store.getPrice(0, p)
+        );
+
+        updateButtonText(1, 'Hire hacker', '+1 Power', 'Cost: $' + store.getPrice(1, p));
+
+        updateButtonText(2, 'Buy Firewall', '+1 Security', 'Cost: $' + store.getPrice(2, p));
+
+        updateButtonText(3, 'Upgrade Server', '+1 Security', 'Cost: $' + store.getPrice(3, p));
+
+        let proxyText;
+        if (p.proxy === PROXY_NONE) {
+            proxyText = 'Buy Basic Proxy';
+        } else {
+            proxyText = 'Buy Enterprise Proxy';
+        }
+
+        updateButtonText(
+            4,
+            proxyText,
+            '+5 Security',
+            'Cost: $' + store.getPrice(4, p) + ' per turn'
+        );
+
+        updateButtonText(
+            5,
+            'Buy Crypto Mine',
+            '+1 Money per turn',
+            'Cost: $' + store.getPrice(5, p)
+        );
+    }
+
+    /**
      * Set message text
      * @param {string} text
      */
@@ -111,6 +167,7 @@
             turn = t + 1;
             console.log('Game start', s.purchases);
             displayStats();
+            updateButtons();
             enableButtons();
             setMessage('Turn ' + turn);
         });
@@ -119,6 +176,7 @@
             playerState = s;
             console.log('State change', s);
             displayStats();
+            updateButtons();
         });
 
         socket.on('turn', (s, os, t) => {
@@ -127,6 +185,7 @@
             turn = t + 1;
             console.log('New turn', s.purchases);
             displayStats();
+            updateButtons();
             enableButtons();
             setMessage('Turn ' + turn);
         });
