@@ -82,6 +82,13 @@
     }
 
     /**
+     * Hide stats.
+     */
+    function hideStates() {
+        stats.innerHTML = [];
+    }
+
+    /**
      * Set score text
      * @param {string} text
      */
@@ -140,16 +147,19 @@
         });
 
         socket.on('end', () => {
+            hideStates();
             disableButtons();
             setMessage('Waiting for opponent...');
         });
 
         socket.on('connect', () => {
+            hideStates();
             disableButtons();
             setMessage('Waiting for opponent...');
         });
 
         socket.on('disconnect', () => {
+            hideStates();
             disableButtons();
             setMessage('Connection lost!');
         });

@@ -365,8 +365,8 @@ module.exports = {
             console.log('End Turn: ' + socket.id);
             user.endedTurn = true;
             if (user.game.turnEnded()) {
-                //user.game.score();
                 user.game.turn();
+                //user.game.score();
             }
         });
 
