@@ -175,7 +175,6 @@
                         'click',
                         e => {
                             socket.emit('purchase', option);
-                            // socket.emit('guess', option);
                         },
                         false
                     );

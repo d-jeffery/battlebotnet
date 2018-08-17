@@ -57,8 +57,8 @@ class Game {
         // Update turn
         this.turnNum++;
         // Updated state
-        this.user1.state.turnUpdate();
-        this.user2.state.turnUpdate();
+        this.user1.state.turnUpdate(this.user2.state);
+        this.user2.state.turnUpdate(this.user1.state);
         // Do turn
         this.user1.turn();
         this.user2.turn();
@@ -69,14 +69,6 @@ class Game {
      */
     turnEnded() {
         return this.user1.endedTurn && this.user2.endedTurn;
-    }
-
-    /**
-     * Is game ended
-     * @return {boolean}
-     */
-    ended() {
-        return this.user1.guess !== GUESS_NO && this.user2.guess !== GUESS_NO;
     }
 
     /**
@@ -115,21 +107,8 @@ class User {
         this.socket = socket;
         this.game = null;
         this.opponent = null;
-        this.guess = GUESS_NO;
         this.endedTurn = false;
         this.state = new State();
-    }
-
-    /**
-     * Set guess value
-     * @param {number} guess
-     */
-    setGuess(guess) {
-        if (!this.opponent || guess <= GUESS_NO || guess > GUESS_SCISSORS) {
-            return false;
-        }
-        this.guess = guess;
-        return true;
     }
 
     /**
@@ -140,7 +119,6 @@ class User {
     start(game, opponent) {
         this.game = game;
         this.opponent = opponent;
-        this.guess = GUESS_NO;
         this.endedTurn = false;
         this.state = new State();
         this.socket.emit('start', this.state, this.opponent.state, this.game.turnNum);
@@ -152,7 +130,6 @@ class User {
     end() {
         this.game = null;
         this.opponent = null;
-        this.guess = GUESS_NO;
         this.endedTurn = false;
         this.state = new State();
         this.socket.emit('end');
@@ -206,13 +183,26 @@ class State {
         this.purchases = new Purchases();
     }
 
-    turnUpdate() {
+    /**
+     * Do update at end of turn.
+     * @param {State} enemyState
+     */
+    turnUpdate(enemyState) {
         this.points.money += 3 + this.purchases.mineLevel;
         if (this.purchases.proxy === PROXY_BASIC) this.points.money -= 2;
         if (this.purchases.proxy === PROXY_ENTERPRISE) this.points.money -= 4;
         this.purchases.hackers = this.purchases.hackers.map(x => x - 1).filter(x => x > 0);
+
+        // Make sure state is up to date
+        this.stateUpdate();
+        enemyState.stateUpdate();
+        // Calculate the availability
+        this.points.availablity = Math.min(this.points.security - enemyState.points.power, 0) + 3;
     }
 
+    /**
+     * Update state based on purchases.
+     */
     stateUpdate() {
         this.points.power = this.purchases.botnetLevel + this.purchases.hackers.length * 3;
         this.points.security =
@@ -231,7 +221,6 @@ class Points {
         this.money = 3;
         this.power = 0;
         this.security = 0;
-        this.traffic = 0;
         this.availablity = 3;
     }
 
@@ -366,17 +355,6 @@ module.exports = {
             }
         });
 
-        socket.on('guess', guess => {
-            console.log('Guess: ' + socket.id);
-            if (user.setGuess(guess) && user.game.ended()) {
-                user.game.score();
-                user.game.start();
-                storage.get('games', 0).then(games => {
-                    storage.set('games', games + 1);
-                });
-            }
-        });
-
         socket.on('purchase', option => {
             console.log('purchase: ' + socket.id);
             store.purchase(option, user.state);
@@ -387,6 +365,7 @@ module.exports = {
             console.log('End Turn: ' + socket.id);
             user.endedTurn = true;
             if (user.game.turnEnded()) {
+                //user.game.score();
                 user.game.turn();
             }
         });
