@@ -55,38 +55,58 @@
     function updateButtons() {
         const p = playerState.purchases;
 
+        // Firewall
         updateButtonText(
-            0,
-            p.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
-            '+1 Power',
-            'Cost: $' + store.getPrice(0, p)
+            BUY_FIREWALL,
+            'Buy Firewall',
+            '+1 Security',
+            'Cost: $' + store.getPrice(BUY_FIREWALL, p)
         );
 
-        updateButtonText(1, 'Hire hacker', '+1 Power', 'Cost: $' + store.getPrice(1, p));
+        // Server
+        updateButtonText(
+            BUY_SERVER,
+            'Upgrade Server',
+            '+1 Security',
+            'Cost: $' + store.getPrice(BUY_SERVER, p)
+        );
 
-        updateButtonText(2, 'Buy Firewall', '+1 Security', 'Cost: $' + store.getPrice(2, p));
-
-        updateButtonText(3, 'Upgrade Server', '+1 Security', 'Cost: $' + store.getPrice(3, p));
-
+        // Proxy
         let proxyText;
         if (p.proxy === PROXY_NONE) {
             proxyText = 'Buy Basic Proxy';
         } else {
             proxyText = 'Buy Enterprise Proxy';
         }
-
         updateButtonText(
-            4,
+            BUY_PROXY,
             proxyText,
             '+5 Security',
-            'Cost: $' + store.getPrice(4, p) + ' per turn'
+            'Cost: $' + store.getPrice(BUY_PROXY, p) + ' per turn'
         );
 
+        // Battlenet
         updateButtonText(
-            5,
+            BUY_BOTNET,
+            p.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
+            '+1 Power',
+            'Cost: $' + store.getPrice(BUY_BOTNET, p)
+        );
+
+        // Hacker
+        updateButtonText(
+            BUY_HACKER,
+            'Hire hacker',
+            '+1 Power',
+            'Cost: $' + store.getPrice(BUY_HACKER, p)
+        );
+
+        // Crypto mine
+        updateButtonText(
+            BUY_MINE,
             'Buy Crypto Mine',
             '+1 Money per turn',
-            'Cost: $' + store.getPrice(5, p)
+            'Cost: $' + store.getPrice(BUY_MINE, p)
         );
     }
 

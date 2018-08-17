@@ -1,17 +1,12 @@
 // @flow
 'use strict';
 
-const GUESS_NO = 0;
-const GUESS_ROCK = 1;
-const GUESS_PAPER = 2;
-const GUESS_SCISSORS = 3;
-
 // Purchase enum
-const BUY_BOTNET = 0;
-const BUY_HACKER = 1;
-const BUY_FIREWALL = 2;
-const BUY_SERVER = 3;
-const BUY_PROXY = 4;
+const BUY_FIREWALL = 0;
+const BUY_SERVER = 1;
+const BUY_PROXY = 2;
+const BUY_BOTNET = 3;
+const BUY_HACKER = 4;
 const BUY_MINE = 5;
 const END_TURN = 6;
 
@@ -33,12 +28,6 @@ const store = {
         if (this.canBuy(option, state)) {
             state.points.money -= this.getPrice(option, state.purchases);
             switch (option) {
-                case BUY_BOTNET:
-                    state.purchases.botnetLevel++;
-                    break;
-                case BUY_HACKER:
-                    state.purchases.hackers.push(3);
-                    break;
                 case BUY_FIREWALL:
                     state.purchases.fireWall = true;
                     break;
@@ -47,6 +36,12 @@ const store = {
                     break;
                 case BUY_PROXY:
                     state.purchases.proxy++;
+                    break;
+                case BUY_BOTNET:
+                    state.purchases.botnetLevel++;
+                    break;
+                case BUY_HACKER:
+                    state.purchases.hackers.push(3);
                     break;
                 case BUY_MINE:
                     state.purchases.mineLevel++;
@@ -85,6 +80,13 @@ const store = {
      */
     getPrice(option, purchases) {
         switch (option) {
+            case BUY_FIREWALL:
+                return 1;
+            case BUY_SERVER:
+                return 2 + purchases.serverLevel;
+            case BUY_PROXY:
+                if (purchases.proxy === PROXY_NONE) return 2;
+                return 3;
             case BUY_BOTNET:
                 if (purchases.botnetLevel === 0) {
                     return 3;
@@ -93,13 +95,6 @@ const store = {
                 }
             case BUY_HACKER:
                 return 5;
-            case BUY_FIREWALL:
-                return 1;
-            case BUY_SERVER:
-                return 2 + purchases.serverLevel;
-            case BUY_PROXY:
-                if (purchases.proxy === PROXY_NONE) return 2;
-                return 3;
             case BUY_MINE:
                 return 3;
             default:
