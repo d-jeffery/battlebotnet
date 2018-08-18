@@ -55,18 +55,10 @@
     function updateButtons() {
         const p = playerState.purchases;
 
-        // Firewall
-        updateButtonText(
-            BUY_FIREWALL,
-            'Buy Firewall',
-            '+2 Security',
-            'Cost: $' + store.getPrice(BUY_FIREWALL, p)
-        );
-
         // Server
         updateButtonText(
             BUY_SERVER,
-            'Upgrade Server',
+            p.serverLevel === 0 ? 'Buy Firewall' : 'Upgrade Server',
             '+1 Security',
             'Cost: $' + store.getPrice(BUY_SERVER, p)
         );
@@ -81,8 +73,16 @@
         updateButtonText(
             BUY_PROXY,
             proxyText,
-            '+5 Security',
+            '+4 Security',
             'Cost: $' + store.getPrice(BUY_PROXY, p) + ' per turn'
+        );
+
+        // Crypto mine
+        updateButtonText(
+            BUY_MINE,
+            'Buy Crypto Mine',
+            '+1 Money per turn',
+            'Cost: $' + store.getPrice(BUY_MINE, p)
         );
 
         // Battlenet
@@ -99,14 +99,6 @@
             'Hire hacker',
             '+3 Power (2 turns)',
             'Cost: $' + store.getPrice(BUY_HACKER, p)
-        );
-
-        // Crypto mine
-        updateButtonText(
-            BUY_MINE,
-            'Buy Crypto Mine',
-            '+1 Money per turn',
-            'Cost: $' + store.getPrice(BUY_MINE, p)
         );
     }
 

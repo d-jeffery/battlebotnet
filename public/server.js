@@ -29,15 +29,24 @@ class Game {
         return this.user1.endedTurn && this.user2.endedTurn;
     }
     score() {
-        (this.user1.guess === GUESS_ROCK && this.user2.guess === GUESS_SCISSORS) ||
-        (this.user1.guess === GUESS_PAPER && this.user2.guess === GUESS_ROCK) ||
-        (this.user1.guess === GUESS_SCISSORS && this.user2.guess === GUESS_PAPER)
-            ? (this.user1.win(), this.user2.lose())
-            : (this.user2.guess === GUESS_ROCK && this.user1.guess === GUESS_SCISSORS) ||
-              (this.user2.guess === GUESS_PAPER && this.user1.guess === GUESS_ROCK) ||
-              (this.user2.guess === GUESS_SCISSORS && this.user1.guess === GUESS_PAPER)
-                ? (this.user2.win(), this.user1.lose())
-                : (this.user1.draw(), this.user2.draw());
+        let e = this.user1.state.points.availablity <= 0,
+            t = this.user2.state.points.availablity <= 0,
+            n = this.user1.state.points.money < 0,
+            s = this.user2.state.points.money < 0;
+        if ((e && t) || (n && s) || (n && t) || (e && s)) {
+            this.user1.draw();
+            this.user2.draw();
+            return !0;
+        } else if (e || n) {
+            this.user2.win();
+            this.user1.lose();
+            return !0;
+        } else if (t || s) {
+            this.user1.win();
+            this.user2.lose();
+            return !0;
+        }
+        return !1;
     }
 }
 class User {
@@ -97,10 +106,7 @@ class State {
     }
     stateUpdate() {
         this.points.power = this.purchases.botnetLevel + this.purchases.hackers.length * 3;
-        this.points.security =
-            this.purchases.serverLevel +
-            (this.purchases.fireWall ? 2 : 0) +
-            this.purchases.proxy * 5;
+        this.points.security = this.purchases.serverLevel + this.purchases.proxy * 4;
     }
 }
 class Points {
@@ -118,7 +124,6 @@ class Purchases {
     constructor() {
         this.botnetLevel = 0;
         this.hackers = [];
-        this.fireWall = !1;
         this.serverLevel = 0;
         this.proxy = PROXY_NONE;
         this.mineLevel = 0;
@@ -134,13 +139,13 @@ module.exports = {
                 removeUser(t),
                 t.opponent && (t.opponent.end(), findOpponent(t.opponent));
         });
-        e.on('purchase', s => {
-            console.log('purchase: ' + e.id), store.purchase(s, t.state), t.stateChange();
+        e.on('purchase', n => {
+            console.log('purchase: ' + e.id), store.purchase(n, t.state), t.stateChange();
         });
         e.on('endTurn', () => {
             console.log('End Turn: ' + e.id),
                 (t.endedTurn = !0),
-                t.game.turnEnded() && t.game.turn();
+                t.game.turnEnded() && (t.game.turn(), t.game.score());
         });
         console.log('Connected: ' + e.id);
     },

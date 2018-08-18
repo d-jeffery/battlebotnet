@@ -8,8 +8,8 @@
         r,
         s,
         a = 0,
-        c = { win: 0, lose: 0, draw: 0 };
-    function u() {
+        u = { win: 0, lose: 0, draw: 0 };
+    function c() {
         for (let e = 0; e < n.length; e++) n[e].setAttribute('disabled', 'disabled');
     }
     function d() {
@@ -25,42 +25,56 @@
     function y() {
         let e = r.purchases;
         l(
-            0,
-            e.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
-            '+1 Power',
-            'Cost: $' + store.getPrice(0, e)
+            BUY_SERVER,
+            e.serverLevel === 0 ? 'Buy Firewall' : 'Upgrade Server',
+            '+1 Security',
+            'Cost: $' + store.getPrice(BUY_SERVER, e)
         );
-        l(1, 'Hire hacker', '+1 Power', 'Cost: $' + store.getPrice(1, e));
-        l(2, 'Buy Firewall', '+1 Security', 'Cost: $' + store.getPrice(2, e));
-        l(3, 'Upgrade Server', '+1 Security', 'Cost: $' + store.getPrice(3, e));
         let n;
         e.proxy === PROXY_NONE ? (n = 'Buy Basic Proxy') : (n = 'Buy Enterprise Proxy');
-        l(4, n, '+5 Security', 'Cost: $' + store.getPrice(4, e) + ' per turn');
-        l(5, 'Buy Crypto Mine', '+1 Money per turn', 'Cost: $' + store.getPrice(5, e));
+        l(BUY_PROXY, n, '+4 Security', 'Cost: $' + store.getPrice(BUY_PROXY, e) + ' per turn');
+        l(
+            BUY_MINE,
+            'Buy Crypto Mine',
+            '+1 Money per turn',
+            'Cost: $' + store.getPrice(BUY_MINE, e)
+        );
+        l(
+            BUY_BOTNET,
+            e.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
+            '+1 Power',
+            'Cost: $' + store.getPrice(BUY_BOTNET, e)
+        );
+        l(
+            BUY_HACKER,
+            'Hire hacker',
+            '+3 Power (2 turns)',
+            'Cost: $' + store.getPrice(BUY_HACKER, e)
+        );
     }
     function g(e) {
         t.innerHTML = e;
     }
-    function p(e) {
+    function v(e) {
         return '<div>' + e + '</div>';
     }
-    function v(e) {
+    function p(e) {
         return [
             'Money: ' + e.money,
             'Power: ' + e.power,
             'Security: ' + e.security,
             'Availability: ' + e.availablity
-        ].map(p);
+        ].map(v);
     }
     function w() {
         o.innerHTML = [
             '<div class="stat-window">',
             '<h2>Your Stats</h2>',
-            ...v(r.points),
+            ...p(r.points),
             '</div>',
             '<div class="stat-window">',
             '<h2>Enemy Stats</h2>',
-            ...v(s.points),
+            ...p(s.points),
             '</div>'
         ].join('');
     }
@@ -70,9 +84,9 @@
     function h(e) {
         i.innerHTML = [
             '<h2>' + e + '</h2>',
-            'Won: ' + c.win,
-            'Lost: ' + c.lose,
-            'Draw: ' + c.draw
+            'Won: ' + u.win,
+            'Lost: ' + u.lose,
+            'Draw: ' + u.draw
         ].join('<br>');
     }
     function m() {
@@ -100,25 +114,25 @@
                 g('Turn ' + a);
         });
         e.on('win', () => {
-            c.win++, h('You win!');
+            u.win++, h('You win!');
         });
         e.on('lose', () => {
-            c.lose++, h('You lose!');
+            u.lose++, h('You lose!');
         });
         e.on('draw', () => {
-            c.draw++, h('Draw!');
+            u.draw++, h('Draw!');
         });
         e.on('end', () => {
-            f(), u(), g('Waiting for opponent...');
+            f(), c(), g('Waiting for opponent...');
         });
         e.on('connect', () => {
-            f(), u(), g('Waiting for opponent...');
+            f(), c(), g('Waiting for opponent...');
         });
         e.on('disconnect', () => {
-            f(), u(), g('Connection lost!');
+            f(), c(), g('Connection lost!');
         });
         e.on('error', () => {
-            u(), g('Connection error!');
+            c(), g('Connection error!');
         });
         for (let t = 0; t < n.length; t++)
             ((n, t) => {
@@ -126,7 +140,7 @@
                     ? n.addEventListener(
                           'click',
                           n => {
-                              u(), e.emit('endTurn');
+                              c(), e.emit('endTurn');
                           },
                           !1
                       )
@@ -145,7 +159,7 @@
         t = document.getElementById('message');
         o = document.getElementById('stats');
         i = document.getElementById('results');
-        u();
+        c();
         m();
     }
     window.addEventListener('load', B, !1);

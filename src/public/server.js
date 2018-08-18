@@ -208,10 +208,7 @@ class State {
      */
     stateUpdate() {
         this.points.power = this.purchases.botnetLevel + this.purchases.hackers.length * 3;
-        this.points.security =
-            this.purchases.serverLevel +
-            (this.purchases.fireWall ? 2 : 0) +
-            this.purchases.proxy * 5;
+        this.points.security = this.purchases.serverLevel + this.purchases.proxy * 4;
     }
 }
 
@@ -244,7 +241,6 @@ class Purchases {
         // Purchases
         this.botnetLevel = 0;
         this.hackers = [];
-        this.fireWall = false;
         this.serverLevel = 0;
         this.proxy = PROXY_NONE;
         this.mineLevel = 0;
