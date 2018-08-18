@@ -72,27 +72,30 @@ class Game {
     }
 
     /**
-     * Final score
+     * Final score.
      */
     score() {
-        if (
-            (this.user1.guess === GUESS_ROCK && this.user2.guess === GUESS_SCISSORS) ||
-            (this.user1.guess === GUESS_PAPER && this.user2.guess === GUESS_ROCK) ||
-            (this.user1.guess === GUESS_SCISSORS && this.user2.guess === GUESS_PAPER)
-        ) {
-            this.user1.win();
-            this.user2.lose();
-        } else if (
-            (this.user2.guess === GUESS_ROCK && this.user1.guess === GUESS_SCISSORS) ||
-            (this.user2.guess === GUESS_PAPER && this.user1.guess === GUESS_ROCK) ||
-            (this.user2.guess === GUESS_SCISSORS && this.user1.guess === GUESS_PAPER)
-        ) {
-            this.user2.win();
-            this.user1.lose();
-        } else {
+        const a1 = this.user1.state.points.availablity <= 0;
+        const a2 = this.user2.state.points.availablity <= 0;
+
+        const m1 = this.user1.state.points.money < 0;
+        const m2 = this.user2.state.points.money < 0;
+
+        if ((a1 && a2) || (m1 && m2) || (m1 && a2) || (a1 && m2)) {
             this.user1.draw();
             this.user2.draw();
+            return true;
+        } else if (a1 || m1) {
+            this.user2.win();
+            this.user1.lose();
+            return true;
+        } else if (a2 || m2) {
+            this.user1.win();
+            this.user2.lose();
+            return true;
         }
+
+        return false;
     }
 }
 
@@ -278,7 +281,7 @@ module.exports = {
             user.endedTurn = true;
             if (user.game.turnEnded()) {
                 user.game.turn();
-                //user.game.score();
+                user.game.score();
             }
         });
 

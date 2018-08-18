@@ -59,7 +59,7 @@
         updateButtonText(
             BUY_FIREWALL,
             'Buy Firewall',
-            '+1 Security',
+            '+2 Security',
             'Cost: $' + store.getPrice(BUY_FIREWALL, p)
         );
 
@@ -97,7 +97,7 @@
         updateButtonText(
             BUY_HACKER,
             'Hire hacker',
-            '+1 Power',
+            '+3 Power (2 turns)',
             'Cost: $' + store.getPrice(BUY_HACKER, p)
         );
 
