@@ -10,14 +10,16 @@
             padding: 0;
             margin: 0;
         }
-
+        #game {
+            display: none;
+        }
         .stat-window {
             display: inline-block;
             margin: 5px 20px;
             padding: 5px;
             border: 1px black solid;
         }
-        #buttons button {
+        button {
             vertical-align: text-top;
             width: 30%;
             height: 75px;
@@ -31,20 +33,26 @@
 <!--
     <canvas id="game"></canvas>
 -->
-    <div id="stats"></div>
+    <button id="start">Start</button>
 
-    <div id="buttons">
-        <div class="button-grp">
-            <button>Upgrade Server</button>
-            <button>Buy Basic Proxy</button>
-            <button>Buy Crypto Mine</button>
-            <button>Buy BotNet</button>
-            <button>Hire Hacker</button>
-            <button>End Turn</button>
+    <div id="game">
+        <div id="stats"></div>
+
+        <div id="buttons">
+            <div class="button-grp">
+                <button>Upgrade Server</button>
+                <button>Buy Basic Proxy</button>
+                <button>Buy Crypto Mine</button>
+                <button>Buy BotNet</button>
+                <button>Hire Hacker</button>
+                <button>End Turn</button>
+            </div>
         </div>
-    </div>
 
-    <div id="results"></div>
+        <button id="restart">Rematch</button>
+
+        <div id="results"></div>
+    </div>
     <p>
         <a href="/stat">Statistics</a>
     </p>

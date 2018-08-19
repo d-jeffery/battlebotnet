@@ -3,6 +3,9 @@
 
 (function() {
     let socket, //Socket.IO client
+        game, // Game element
+        startButton, // Start button
+        restartButton, // Restart button
         buttons, //Button elements
         message, //Message element
         stats, //Status element
@@ -15,6 +18,22 @@
             lose: 0,
             draw: 0
         };
+
+    /**
+     * Hide an element.
+     * @param button
+     */
+    function hide(e) {
+        e.style.display = 'none';
+    }
+
+    /**
+     * Show an element.
+     * @param button
+     */
+    function show(e) {
+        e.style.display = 'inline-block';
+    }
 
     /**
      * Disable all button
@@ -136,7 +155,7 @@
     /**
      * Set score text
      */
-    function displayStats() {
+    function updateStats() {
         stats.innerHTML = [
             '<div class="stat-window">',
             '<h2>Your Stats</h2>',
@@ -178,7 +197,9 @@
             enemyState = os;
             turn = t + 1;
             console.log('Game start', s.purchases);
-            displayStats();
+            hide(restartButton);
+            show(game);
+            updateStats();
             updateButtons();
             enableButtons();
             setMessage('Turn ' + turn);
@@ -187,7 +208,7 @@
         socket.on('state', s => {
             playerState = s;
             console.log('State change', s);
-            displayStats();
+            updateStats();
             updateButtons();
         });
 
@@ -196,7 +217,7 @@
             enemyState = os;
             turn = t + 1;
             console.log('New turn', s.purchases);
-            displayStats();
+            updateStats();
             updateButtons();
             enableButtons();
             setMessage('Turn ' + turn);
@@ -204,41 +225,71 @@
 
         socket.on('win', () => {
             score.win++;
+            show(restartButton);
+            disableButtons();
             displayScore('You win!');
         });
 
         socket.on('lose', () => {
             score.lose++;
+            show(restartButton);
+            disableButtons();
             displayScore('You lose!');
         });
 
         socket.on('draw', () => {
             score.draw++;
+            show(restartButton);
+            disableButtons();
             displayScore('Draw!');
         });
 
         socket.on('end', () => {
-            hideStates();
+            hide(game);
             disableButtons();
             setMessage('Waiting for opponent...');
         });
 
         socket.on('connect', () => {
-            hideStates();
+            show(startButton);
+            hide(game);
             disableButtons();
-            setMessage('Waiting for opponent...');
+            setMessage('Press Start to Begin');
         });
 
         socket.on('disconnect', () => {
-            hideStates();
+            hide(game);
             disableButtons();
             setMessage('Connection lost!');
         });
 
         socket.on('error', () => {
+            hide(game);
             disableButtons();
             setMessage('Connection error!');
         });
+
+        startButton.addEventListener(
+            'click',
+            e => {
+                setMessage('Waiting for opponent...');
+                hide(startButton);
+                disableButtons();
+                socket.emit('start');
+            },
+            false
+        );
+
+        restartButton.addEventListener(
+            'click',
+            e => {
+                setMessage('Wait for rematch...');
+                hide(restartButton);
+                disableButtons();
+                socket.emit('restart');
+            },
+            false
+        );
 
         for (let i = 0; i < buttons.length; i++) {
             ((button, option) => {
@@ -269,10 +320,14 @@
      */
     function init() {
         socket = io({ upgrade: false, transports: ['websocket'] });
-        buttons = document.getElementsByTagName('button');
+        game = document.getElementById('game');
+        startButton = document.getElementById('start');
+        restartButton = document.getElementById('restart');
+        buttons = document.getElementById('buttons').getElementsByTagName('button');
         message = document.getElementById('message');
         stats = document.getElementById('stats');
         results = document.getElementById('results');
+        hide(restartButton);
         disableButtons();
         bind();
     }

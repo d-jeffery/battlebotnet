@@ -48,6 +48,9 @@ class Game {
         }
         return !1;
     }
+    rematch() {
+        return this.user1.rematch && this.user2.rematch;
+    }
 }
 class User {
     constructor(e) {
@@ -55,12 +58,14 @@ class User {
         this.game = null;
         this.opponent = null;
         this.endedTurn = !1;
+        this.rematch = !1;
         this.state = new State();
     }
     start(e, t) {
         this.game = e;
         this.opponent = t;
         this.endedTurn = !1;
+        this.rematch = !1;
         this.state = new State();
         this.socket.emit('start', this.state, this.opponent.state, this.game.turnNum);
     }
@@ -132,8 +137,12 @@ class Purchases {
 module.exports = {
     io: e => {
         let t = new User(e);
-        users.push(t);
-        findOpponent(t);
+        e.on('start', () => {
+            console.log('Start: ' + e.id), users.push(t), findOpponent(t);
+        });
+        e.on('restart', () => {
+            console.log('Restart: ' + e.id), (t.rematch = !0), t.game.rematch() && t.game.start();
+        });
         e.on('disconnect', () => {
             console.log('Disconnected: ' + e.id),
                 removeUser(t),

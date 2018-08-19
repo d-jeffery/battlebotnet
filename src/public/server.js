@@ -97,6 +97,13 @@ class Game {
 
         return false;
     }
+
+    /**
+     * Whether to have a rematch.
+     */
+    rematch() {
+        return this.user1.rematch && this.user2.rematch;
+    }
 }
 
 /**
@@ -111,6 +118,7 @@ class User {
         this.game = null;
         this.opponent = null;
         this.endedTurn = false;
+        this.rematch = false;
         this.state = new State();
     }
 
@@ -123,6 +131,7 @@ class User {
         this.game = game;
         this.opponent = opponent;
         this.endedTurn = false;
+        this.rematch = false;
         this.state = new State();
         this.socket.emit('start', this.state, this.opponent.state, this.game.turnNum);
     }
@@ -254,8 +263,20 @@ class Purchases {
 module.exports = {
     io: socket => {
         const user = new User(socket);
-        users.push(user);
-        findOpponent(user);
+
+        socket.on('start', () => {
+            console.log('Start: ' + socket.id);
+            users.push(user);
+            findOpponent(user);
+        });
+
+        socket.on('restart', () => {
+            console.log('Restart: ' + socket.id);
+            user.rematch = true;
+            if (user.game.rematch()) {
+                user.game.start();
+            }
+        });
 
         socket.on('disconnect', () => {
             console.log('Disconnected: ' + socket.id);

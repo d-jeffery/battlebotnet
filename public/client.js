@@ -1,166 +1,192 @@
 'use strict';
 !(function() {
     let e,
-        n,
         t,
-        o,
+        n,
         i,
         r,
+        o,
         s,
-        a = 0,
-        u = { win: 0, lose: 0, draw: 0 };
-    function c() {
-        for (let e = 0; e < n.length; e++) n[e].setAttribute('disabled', 'disabled');
+        a,
+        c,
+        d,
+        u = 0,
+        l = { win: 0, lose: 0, draw: 0 };
+    function y(e) {
+        e.style.display = 'none';
     }
-    function d() {
-        for (let e = 0; e < n.length; e++) n[e].removeAttribute('disabled');
+    function g(e) {
+        e.style.display = 'inline-block';
     }
-    function l(e, t, o, i) {
-        n[e].innerHTML = [
+    function v() {
+        for (let e = 0; e < r.length; e++) r[e].setAttribute('disabled', 'disabled');
+    }
+    function p() {
+        for (let e = 0; e < r.length; e++) r[e].removeAttribute('disabled');
+    }
+    function m(e, t, n, i) {
+        r[e].innerHTML = [
             '<div>' + t + '</div>',
-            '<div>' + o + '</div>',
+            '<div>' + n + '</div>',
             '<div>' + i + '</div>'
         ].join('');
     }
-    function y() {
-        let e = r.purchases;
-        l(
+    function f() {
+        let e = c.purchases;
+        m(
             BUY_SERVER,
             e.serverLevel === 0 ? 'Buy Firewall' : 'Upgrade Server',
             '+1 Security',
             'Cost: $' + store.getPrice(BUY_SERVER, e)
         );
-        let n;
-        e.proxy === PROXY_NONE ? (n = 'Buy Basic Proxy') : (n = 'Buy Enterprise Proxy');
-        l(BUY_PROXY, n, '+4 Security', 'Cost: $' + store.getPrice(BUY_PROXY, e) + ' per turn');
-        l(
+        let t;
+        e.proxy === PROXY_NONE ? (t = 'Buy Basic Proxy') : (t = 'Buy Enterprise Proxy');
+        m(BUY_PROXY, t, '+4 Security', 'Cost: $' + store.getPrice(BUY_PROXY, e) + ' per turn');
+        m(
             BUY_MINE,
             'Buy Crypto Mine',
             '+1 Money per turn',
             'Cost: $' + store.getPrice(BUY_MINE, e)
         );
-        l(
+        m(
             BUY_BOTNET,
             e.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
             '+1 Power',
             'Cost: $' + store.getPrice(BUY_BOTNET, e)
         );
-        l(
+        m(
             BUY_HACKER,
             'Hire hacker',
             '+3 Power (2 turns)',
             'Cost: $' + store.getPrice(BUY_HACKER, e)
         );
     }
-    function g(e) {
-        t.innerHTML = e;
+    function w(e) {
+        o.innerHTML = e;
     }
-    function v(e) {
+    function h(e) {
         return '<div>' + e + '</div>';
     }
-    function p(e) {
+    function B(e) {
         return [
             'Money: ' + e.money,
             'Power: ' + e.power,
             'Security: ' + e.security,
             'Availability: ' + e.availablity
-        ].map(v);
+        ].map(h);
     }
-    function w() {
-        o.innerHTML = [
+    function E() {
+        s.innerHTML = [
             '<div class="stat-window">',
             '<h2>Your Stats</h2>',
-            ...p(r.points),
+            ...B(c.points),
             '</div>',
             '<div class="stat-window">',
             '<h2>Enemy Stats</h2>',
-            ...p(s.points),
+            ...B(d.points),
             '</div>'
         ].join('');
     }
-    function f() {
-        o.innerHTML = [];
-    }
-    function h(e) {
-        i.innerHTML = [
+    function b(e) {
+        a.innerHTML = [
             '<h2>' + e + '</h2>',
-            'Won: ' + u.win,
-            'Lost: ' + u.lose,
-            'Draw: ' + u.draw
+            'Won: ' + l.win,
+            'Lost: ' + l.lose,
+            'Draw: ' + l.draw
         ].join('<br>');
     }
-    function m() {
-        e.on('start', (e, n, t) => {
-            (r = e),
-                (s = n),
-                (a = t + 1),
+    function L() {
+        e.on('start', (e, n, r) => {
+            (c = e),
+                (d = n),
+                (u = r + 1),
                 console.log('Game start', e.purchases),
-                w(),
-                y(),
-                d(),
-                g('Turn ' + a);
+                y(i),
+                g(t),
+                E(),
+                f(),
+                p(),
+                w('Turn ' + u);
         });
         e.on('state', e => {
-            (r = e), console.log('State change', e), w(), y();
+            (c = e), console.log('State change', e), E(), f();
         });
-        e.on('turn', (e, n, t) => {
-            (r = e),
-                (s = n),
-                (a = t + 1),
+        e.on('turn', (e, t, n) => {
+            (c = e),
+                (d = t),
+                (u = n + 1),
                 console.log('New turn', e.purchases),
-                w(),
-                y(),
-                d(),
-                g('Turn ' + a);
+                E(),
+                f(),
+                p(),
+                w('Turn ' + u);
         });
         e.on('win', () => {
-            u.win++, h('You win!');
+            l.win++, g(i), v(), b('You win!');
         });
         e.on('lose', () => {
-            u.lose++, h('You lose!');
+            l.lose++, g(i), v(), b('You lose!');
         });
         e.on('draw', () => {
-            u.draw++, h('Draw!');
+            l.draw++, g(i), v(), b('Draw!');
         });
         e.on('end', () => {
-            f(), c(), g('Waiting for opponent...');
+            y(t), v(), w('Waiting for opponent...');
         });
         e.on('connect', () => {
-            f(), c(), g('Waiting for opponent...');
+            g(n), y(t), v(), w('Press Start to Begin');
         });
         e.on('disconnect', () => {
-            f(), c(), g('Connection lost!');
+            y(t), v(), w('Connection lost!');
         });
         e.on('error', () => {
-            c(), g('Connection error!');
+            y(t), v(), w('Connection error!');
         });
-        for (let t = 0; t < n.length; t++)
-            ((n, t) => {
-                t === END_TURN
-                    ? n.addEventListener(
+        n.addEventListener(
+            'click',
+            t => {
+                w('Waiting for opponent...'), y(n), v(), e.emit('start');
+            },
+            !1
+        );
+        i.addEventListener(
+            'click',
+            t => {
+                w('Wait for rematch...'), y(i), v(), e.emit('restart');
+            },
+            !1
+        );
+        for (let t = 0; t < r.length; t++)
+            ((t, n) => {
+                n === END_TURN
+                    ? t.addEventListener(
                           'click',
-                          n => {
-                              c(), e.emit('endTurn');
+                          t => {
+                              v(), e.emit('endTurn');
                           },
                           !1
                       )
-                    : n.addEventListener(
+                    : t.addEventListener(
                           'click',
-                          n => {
-                              e.emit('purchase', t);
+                          t => {
+                              e.emit('purchase', n);
                           },
                           !1
                       );
-            })(n[t], t);
+            })(r[t], t);
     }
-    function B() {
+    function P() {
         e = io({ upgrade: !1, transports: ['websocket'] });
-        n = document.getElementsByTagName('button');
-        t = document.getElementById('message');
-        o = document.getElementById('stats');
-        i = document.getElementById('results');
-        c();
-        m();
+        t = document.getElementById('game');
+        n = document.getElementById('start');
+        i = document.getElementById('restart');
+        r = document.getElementById('buttons').getElementsByTagName('button');
+        o = document.getElementById('message');
+        s = document.getElementById('stats');
+        a = document.getElementById('results');
+        y(i);
+        v();
+        L();
     }
-    window.addEventListener('load', B, !1);
+    window.addEventListener('load', P, !1);
 })();
