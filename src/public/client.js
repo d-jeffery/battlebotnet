@@ -114,6 +114,12 @@
             '+3 Power (2 turns)',
             'Cost: $' + store.getPrice(BUY_HACKER, p)
         );
+
+        for (let i = 0; i < buttons.length - 1; i++) {
+            if (!store.canBuy(i, playerState)) {
+                buttons[i].setAttribute('disabled', 'disabled');
+            }
+        }
     }
 
     /**
@@ -176,8 +182,8 @@
             show(buttonsDiv);
             show(game);
             updateStats();
-            updateButtons();
             enableButtons();
+            updateButtons();
             setMessage('Turn ' + turn);
         });
 
@@ -194,8 +200,8 @@
             turn = t + 1;
             console.log('New turn', s.purchases);
             updateStats();
-            updateButtons();
             enableButtons();
+            updateButtons();
             setMessage('Turn ' + turn);
         });
 
