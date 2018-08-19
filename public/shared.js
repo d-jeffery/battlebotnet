@@ -48,18 +48,14 @@ let BUY_SERVER = 0,
                 case BUY_SERVER:
                     return 1 + r.serverLevel;
                 case BUY_PROXY:
-                    if (r.proxy === PROXY_NONE) return 2;
-                    return 3;
+                    if (r.proxy === PROXY_NONE) return 1;
+                    return 2;
                 case BUY_MINE:
                     return 3;
                 case BUY_BOTNET:
-                    if (r.botnetLevel === 0) {
-                        return 3;
-                    } else {
-                        return 2;
-                    }
+                    return 2;
                 case BUY_HACKER:
-                    return 5;
+                    return 4;
                 default:
                     return Number.MAX_SAFE_INTEGER;
             }

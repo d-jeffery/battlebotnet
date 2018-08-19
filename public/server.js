@@ -102,8 +102,8 @@ class State {
     }
     turnUpdate(e) {
         this.points.money += 3 + this.purchases.mineLevel;
-        this.purchases.proxy === PROXY_BASIC && (this.points.money -= 2);
-        this.purchases.proxy === PROXY_ENTERPRISE && (this.points.money -= 4);
+        this.purchases.proxy === PROXY_BASIC && (this.points.money -= 1);
+        this.purchases.proxy === PROXY_ENTERPRISE && (this.points.money -= 2);
         this.purchases.hackers = this.purchases.hackers.map(e => e - 1).filter(e => e > 0);
         this.stateUpdate();
         e.stateUpdate();

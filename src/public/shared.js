@@ -77,18 +77,14 @@ const store = {
             case BUY_SERVER:
                 return 1 + purchases.serverLevel;
             case BUY_PROXY:
-                if (purchases.proxy === PROXY_NONE) return 2;
-                return 3;
+                if (purchases.proxy === PROXY_NONE) return 1;
+                return 2;
             case BUY_MINE:
                 return 3;
             case BUY_BOTNET:
-                if (purchases.botnetLevel === 0) {
-                    return 3;
-                } else {
-                    return 2;
-                }
+                return 2;
             case BUY_HACKER:
-                return 5;
+                return 4;
             default:
                 return Number.MAX_SAFE_INTEGER;
         }

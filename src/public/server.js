@@ -201,8 +201,8 @@ class State {
      */
     turnUpdate(enemyState) {
         this.points.money += 3 + this.purchases.mineLevel;
-        if (this.purchases.proxy === PROXY_BASIC) this.points.money -= 2;
-        if (this.purchases.proxy === PROXY_ENTERPRISE) this.points.money -= 4;
+        if (this.purchases.proxy === PROXY_BASIC) this.points.money -= 1;
+        if (this.purchases.proxy === PROXY_ENTERPRISE) this.points.money -= 2;
         this.purchases.hackers = this.purchases.hackers.map(x => x - 1).filter(x => x > 0);
 
         // Make sure state is up to date
