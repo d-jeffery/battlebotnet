@@ -6,22 +6,17 @@
         game, // Game element
         startButton, // Start button
         restartButton, // Restart button
+        buttonsDiv, // The div wrapper around buttons
         buttons, //Button elements
         message, //Message element
         stats, //Status element
-        results, //Results element
         playerState,
         enemyState,
-        turn = 0,
-        score = {
-            win: 0,
-            lose: 0,
-            draw: 0
-        };
+        turn = 0;
 
     /**
      * Hide an element.
-     * @param button
+     * @param {HTMLElement} e
      */
     function hide(e) {
         e.style.display = 'none';
@@ -29,7 +24,7 @@
 
     /**
      * Show an element.
-     * @param button
+     * @param {HTMLElement} e
      */
     function show(e) {
         e.style.display = 'inline-block';
@@ -169,26 +164,6 @@
     }
 
     /**
-     * Hide stats.
-     */
-    function hideStates() {
-        stats.innerHTML = [];
-    }
-
-    /**
-     * Set score text
-     * @param {string} text
-     */
-    function displayScore(text) {
-        results.innerHTML = [
-            '<h2>' + text + '</h2>',
-            'Won: ' + score.win,
-            'Lost: ' + score.lose,
-            'Draw: ' + score.draw
-        ].join('<br>');
-    }
-
-    /**
      * Bind Socket.IO and button events
      */
     function bind() {
@@ -198,6 +173,7 @@
             turn = t + 1;
             console.log('Game start', s.purchases);
             hide(restartButton);
+            show(buttonsDiv);
             show(game);
             updateStats();
             updateButtons();
@@ -224,24 +200,24 @@
         });
 
         socket.on('win', () => {
-            score.win++;
             show(restartButton);
+            hide(buttonsDiv);
             disableButtons();
-            displayScore('You win!');
+            setMessage('You win!');
         });
 
         socket.on('lose', () => {
-            score.lose++;
             show(restartButton);
+            hide(buttonsDiv);
             disableButtons();
-            displayScore('You lose!');
+            setMessage('You lose!');
         });
 
         socket.on('draw', () => {
-            score.draw++;
             show(restartButton);
+            hide(buttonsDiv);
             disableButtons();
-            displayScore('Draw!');
+            setMessage('Draw!');
         });
 
         socket.on('end', () => {
@@ -283,7 +259,7 @@
         restartButton.addEventListener(
             'click',
             e => {
-                setMessage('Wait for rematch...');
+                setMessage('Waiting for rematch...');
                 hide(restartButton);
                 disableButtons();
                 socket.emit('restart');
@@ -323,10 +299,10 @@
         game = document.getElementById('game');
         startButton = document.getElementById('start');
         restartButton = document.getElementById('restart');
-        buttons = document.getElementById('buttons').getElementsByTagName('button');
+        buttonsDiv = document.getElementById('buttons');
+        buttons = buttonsDiv.getElementsByTagName('button');
         message = document.getElementById('message');
         stats = document.getElementById('stats');
-        results = document.getElementById('results');
         hide(restartButton);
         disableButtons();
         bind();

@@ -10,30 +10,29 @@
         a,
         c,
         d,
-        u = 0,
-        l = { win: 0, lose: 0, draw: 0 };
-    function y(e) {
+        u = 0;
+    function l(e) {
         e.style.display = 'none';
     }
-    function g(e) {
+    function y(e) {
         e.style.display = 'inline-block';
     }
+    function g() {
+        for (let e = 0; e < o.length; e++) o[e].setAttribute('disabled', 'disabled');
+    }
     function v() {
-        for (let e = 0; e < r.length; e++) r[e].setAttribute('disabled', 'disabled');
+        for (let e = 0; e < o.length; e++) o[e].removeAttribute('disabled');
     }
-    function p() {
-        for (let e = 0; e < r.length; e++) r[e].removeAttribute('disabled');
-    }
-    function m(e, t, n, i) {
-        r[e].innerHTML = [
+    function p(e, t, n, i) {
+        o[e].innerHTML = [
             '<div>' + t + '</div>',
             '<div>' + n + '</div>',
             '<div>' + i + '</div>'
         ].join('');
     }
-    function f() {
+    function m() {
         let e = c.purchases;
-        m(
+        p(
             BUY_SERVER,
             e.serverLevel === 0 ? 'Buy Firewall' : 'Upgrade Server',
             '+1 Security',
@@ -41,128 +40,121 @@
         );
         let t;
         e.proxy === PROXY_NONE ? (t = 'Buy Basic Proxy') : (t = 'Buy Enterprise Proxy');
-        m(BUY_PROXY, t, '+4 Security', 'Cost: $' + store.getPrice(BUY_PROXY, e) + ' per turn');
-        m(
+        p(BUY_PROXY, t, '+4 Security', 'Cost: $' + store.getPrice(BUY_PROXY, e) + ' per turn');
+        p(
             BUY_MINE,
             'Buy Crypto Mine',
             '+1 Money per turn',
             'Cost: $' + store.getPrice(BUY_MINE, e)
         );
-        m(
+        p(
             BUY_BOTNET,
             e.botnetLevel === 0 ? 'Buy BotNet' : 'Upgrade BotNet',
             '+1 Power',
             'Cost: $' + store.getPrice(BUY_BOTNET, e)
         );
-        m(
+        p(
             BUY_HACKER,
             'Hire hacker',
             '+3 Power (2 turns)',
             'Cost: $' + store.getPrice(BUY_HACKER, e)
         );
     }
-    function w(e) {
-        o.innerHTML = e;
-    }
-    function h(e) {
-        return '<div>' + e + '</div>';
+    function f(e) {
+        s.innerHTML = e;
     }
     function B(e) {
+        return '<div>' + e + '</div>';
+    }
+    function h(e) {
         return [
             'Money: ' + e.money,
             'Power: ' + e.power,
             'Security: ' + e.security,
             'Availability: ' + e.availablity
-        ].map(h);
+        ].map(B);
     }
-    function E() {
-        s.innerHTML = [
+    function w() {
+        a.innerHTML = [
             '<div class="stat-window">',
             '<h2>Your Stats</h2>',
-            ...B(c.points),
+            ...h(c.points),
             '</div>',
             '<div class="stat-window">',
             '<h2>Enemy Stats</h2>',
-            ...B(d.points),
+            ...h(d.points),
             '</div>'
         ].join('');
     }
-    function b(e) {
-        a.innerHTML = [
-            '<h2>' + e + '</h2>',
-            'Won: ' + l.win,
-            'Lost: ' + l.lose,
-            'Draw: ' + l.draw
-        ].join('<br>');
-    }
-    function L() {
-        e.on('start', (e, n, r) => {
+    function E() {
+        e.on('start', (e, n, o) => {
             (c = e),
                 (d = n),
-                (u = r + 1),
+                (u = o + 1),
                 console.log('Game start', e.purchases),
-                y(i),
-                g(t),
-                E(),
-                f(),
-                p(),
-                w('Turn ' + u);
+                l(i),
+                y(r),
+                y(t),
+                w(),
+                m(),
+                v(),
+                f('Turn ' + u);
         });
         e.on('state', e => {
-            (c = e), console.log('State change', e), E(), f();
+            (c = e), console.log('State change', e), w(), m();
         });
         e.on('turn', (e, t, n) => {
             (c = e),
                 (d = t),
                 (u = n + 1),
                 console.log('New turn', e.purchases),
-                E(),
-                f(),
-                p(),
-                w('Turn ' + u);
+                w(),
+                m(),
+                v(),
+                f('Turn ' + u);
         });
         e.on('win', () => {
-            l.win++, g(i), v(), b('You win!');
+            y(i), l(r), g(), f('You win!');
         });
         e.on('lose', () => {
-            l.lose++, g(i), v(), b('You lose!');
+            y(i), l(r), g(), f('You lose!');
         });
         e.on('draw', () => {
-            l.draw++, g(i), v(), b('Draw!');
+            y(i), l(r), g(), f('Draw!');
         });
         e.on('end', () => {
-            y(t), v(), w('Waiting for opponent...');
+            l(t), g(), f('Waiting for opponent...');
         });
         e.on('connect', () => {
-            g(n), y(t), v(), w('Press Start to Begin');
+            y(n), l(t), g(), f('Press Start to Begin');
         });
         e.on('disconnect', () => {
-            y(t), v(), w('Connection lost!');
+            l(t), g(), f('Connection lost!');
         });
         e.on('error', () => {
-            y(t), v(), w('Connection error!');
+            l(t), g(), f('Connection error!');
         });
         n.addEventListener(
             'click',
             t => {
-                w('Waiting for opponent...'), y(n), v(), e.emit('start');
+                f('Waiting for opponent...'), l(n), g(), e.emit('start');
             },
             !1
         );
         i.addEventListener(
             'click',
             t => {
-                w('Wait for rematch...'), y(i), v(), e.emit('restart');
+                f('Waiting for rematch...'), l(i), g(), e.emit('restart');
             },
             !1
         );
-        for (let t = 0; t < r.length; t++)
+        for (let t = 0; t < o.length; t++)
             ((t, n) => {
                 n === END_TURN
                     ? t.addEventListener(
                           'click',
                           t => {
-                              v(), e.emit('endTurn');
+                              g(), e.emit('endTurn');
                           },
                           !1
                       )
@@ -173,20 +165,20 @@
                           },
                           !1
                       );
-            })(r[t], t);
+            })(o[t], t);
     }
-    function P() {
+    function b() {
         e = io({ upgrade: !1, transports: ['websocket'] });
         t = document.getElementById('game');
         n = document.getElementById('start');
         i = document.getElementById('restart');
-        r = document.getElementById('buttons').getElementsByTagName('button');
-        o = document.getElementById('message');
-        s = document.getElementById('stats');
-        a = document.getElementById('results');
-        y(i);
-        v();
-        L();
+        r = document.getElementById('buttons');
+        o = r.getElementsByTagName('button');
+        s = document.getElementById('message');
+        a = document.getElementById('stats');
+        l(i);
+        g();
+        E();
     }
-    window.addEventListener('load', P, !1);
+    window.addEventListener('load', b, !1);
 })();
